@@ -121,6 +121,34 @@ async function exportTabs(folder) {
   });
 }
 
+// ---------- restore support ----------
+
+// Runs after any in-flight sync so the stored visits are not overwritten by it.
+async function mergeHistory(visits) {
+  while (running) await running.catch(() => {});
+  const { historyStore } = await chrome.storage.local.get('historyStore');
+  const store = historyStore || { lastSync: 0, visits: [] };
+  const seen = new Set(store.visits.map((v) => `${v.url}|${v.visitTime}`));
+  let added = 0;
+  for (const v of visits) {
+    if (!v?.url || typeof v.visitTime !== 'number') continue;
+    const key = `${v.url}|${v.visitTime}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    store.visits.push({
+      url: v.url,
+      title: v.title || '',
+      visitTime: v.visitTime,
+      visitTimeISO: new Date(v.visitTime).toISOString(),
+      transition: v.transition,
+    });
+    added++;
+  }
+  store.visits.sort((a, b) => a.visitTime - b.visitTime);
+  await chrome.storage.local.set({ historyStore: store });
+  return { ok: true, added, total: store.visits.length };
+}
+
 // ---------- sync orchestration ----------
 
 const PARTS = [['bookmarks', exportBookmarks], ['history', exportHistory], ['tabs', exportTabs]];
@@ -187,6 +215,10 @@ chrome.action.onClicked.addListener(() => chrome.runtime.openOptionsPage());
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (msg?.type === 'sync-now') {
     syncAll('manual').then(sendResponse);
+    return true;
+  }
+  if (msg?.type === 'merge-history') {
+    mergeHistory(msg.visits).then(sendResponse, (e) => sendResponse({ ok: false, error: e.message || String(e) }));
     return true;
   }
   if (msg?.type === 'settings-changed') {

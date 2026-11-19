@@ -8,7 +8,10 @@
     label { display: block; margin: 1em 0 .25em; font-weight: 600; }
     input { padding: .3em; width: 100%; box-sizing: border-box; }
     button { margin: 1em .5em 0 0; padding: .4em 1em; }
-    #status { margin-top: 1.5em; white-space: pre-wrap; }
+    #status, .result { margin-top: 1em; white-space: pre-wrap; }
+    #status { margin-top: 1.5em; }
+    select { padding: .3em; }
+    h2 { margin-top: 2em; border-top: 1px solid #ccc; padding-top: 1em; }
     small { color: #666; }
   </style>
 </head>
@@ -18,12 +21,37 @@
   <input id="interval" type="number" min="1">
   <label for="folder">Target folder (absolute path)</label>
   <input id="folder" placeholder="C:\Users\you\Documents\bookmarker">
-  <small>Files written: bookmarks.json and history.json in that folder (overwritten on every sync).</small>
+  <small>Files written: bookmarks.json, history.json and tabs.json in that folder (overwritten on every sync; a daily copy of the previous version is kept in a <code>backups</code> subfolder).</small>
   <div>
     <button id="save">Save</button>
     <button id="sync">Sync now</button>
   </div>
   <div id="status"></div>
+
+  <h2>Restore</h2>
+  <small>Pick a file previously written by this extension (e.g. from the target folder or its <code>backups</code> folder). Syncs overwrite the files in the target folder, so restore from a backup copy if the current files are already out of date.</small>
+
+  <h3>Bookmarks</h3>
+  <input id="bm-file" type="file" accept=".json,application/json">
+  <small>Imported into a new "Restored …" folder inside Other bookmarks; nothing existing is changed.</small>
+  <div><button id="bm-restore">Restore bookmarks</button></div>
+  <div id="bm-status" class="result"></div>
+
+  <h3>History</h3>
+  <input id="hist-file" type="file" accept=".json,application/json">
+  <small>Browsers cannot add visits with their original dates, so this merges the file into the extension's accumulated history, which is what history.json is written from. It does not change the browser's own history page.</small>
+  <div><button id="hist-restore">Restore history</button></div>
+  <div id="hist-status" class="result"></div>
+
+  <h3>Open tabs</h3>
+  <input id="tabs-file" type="file" accept=".json,application/json">
+  <label for="tabs-workspace">Only this Vivaldi workspace</label>
+  <select id="tabs-workspace" disabled><option value="">All tabs</option></select>
+  <small>Reopens tabs in new windows, including pinned state and tab groups (Chrome/Brave). Browser-internal pages are skipped.</small>
+  <div><button id="tabs-restore">Restore tabs</button></div>
+  <div id="tabs-status" class="result"></div>
+
   <script src="options.js"></script>
+  <script src="restore.js"></script>
 </body>
 </html>

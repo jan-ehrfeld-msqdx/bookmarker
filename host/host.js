@@ -31,11 +31,31 @@ function reply(obj) {
   process.stdout.write(Buffer.concat([header, body]), () => process.exit(0));
 }
 
+const BACKUPS_KEPT = 14;
+const BACKUP_INTERVAL_MS = 24 * 60 * 60 * 1000;
+
+// Keeps a dated copy of the previous file (at most one per day) so an empty fresh profile
+// cannot permanently overwrite the last good export.
+function backupExisting(folder, name, target) {
+  if (!fs.existsSync(target)) return;
+  const dir = path.join(folder, 'backups');
+  fs.mkdirSync(dir, { recursive: true });
+  const base = path.basename(name, '.json');
+  const existing = fs.readdirSync(dir).filter((f) => f.startsWith(`${base}-`) && f.endsWith('.json')).sort();
+  const latest = existing[existing.length - 1];
+  if (latest && Date.now() - fs.statSync(path.join(dir, latest)).mtimeMs < BACKUP_INTERVAL_MS) return;
+  const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\..*/, '').replace('T', '-');
+  fs.copyFileSync(target, path.join(dir, `${base}-${stamp}.json`));
+  existing.push(`${base}-${stamp}.json`);
+  for (const old of existing.slice(0, Math.max(0, existing.length - BACKUPS_KEPT))) fs.unlinkSync(path.join(dir, old));
+}
+
 function write({ folder, name, data }) {
   if (!ALLOWED_NAMES.has(name)) throw new Error(`File name not allowed: ${name}`);
   if (typeof folder !== 'string' || !path.isAbsolute(folder)) throw new Error('Folder must be an absolute path');
   fs.mkdirSync(folder, { recursive: true });
   const target = path.join(folder, name);
+  backupExisting(folder, name, target);
   const tmp = `${target}.tmp`;
   fs.writeFileSync(tmp, JSON.stringify(data, null, 2), 'utf8');
   fs.renameSync(tmp, target);

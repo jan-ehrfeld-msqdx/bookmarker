@@ -61,7 +61,7 @@ async function exportHistory(folder) {
       });
     }
   }
-  store.visits.sort((a, b) => a.visitTime - b.visitTime);
+  store.visits.sort((a, b) => b.visitTime - a.visitTime);
   store.lastSync = syncStart;
 
   await writeJson(folder, HISTORY_FILE, {
@@ -144,7 +144,7 @@ async function mergeHistory(visits) {
     });
     added++;
   }
-  store.visits.sort((a, b) => a.visitTime - b.visitTime);
+  store.visits.sort((a, b) => b.visitTime - a.visitTime);
   await chrome.storage.local.set({ historyStore: store });
   return { ok: true, added, total: store.visits.length };
 }

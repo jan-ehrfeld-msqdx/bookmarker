@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Bookmarker",
+  "version": "1.2.0",
+  "description": "Periodically exports bookmarks and browsing history to JSON files in a folder of your choice.",
+  "minimum_chrome_version": "109",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAp+OguAZ/ZFE0sadag/yvGBLdHMFzq7n6yB/LW+clu6kRjjJcv/wlistg58zhuSe0cGPIz23jh6WKZEO/SIn1aHJSpIbXQlxaseAXoWVqtGuCRcIh2yFHTMZehdLakJm70AMdOKhJSnWgcsFveCKyhwM5oVWKwDdXJPUMFwwK3sRHCYmSFiKPwb+E/YP5Sf4n0d4BXkczpeTsfM5cy5ONuqRYk1j9MCsCD4Xnaku8xofrT9XPLG0G7lVbzsEbr5XiHpPbWd31og+ISQ1YFS+tO5IX7UTnAAO/0dCGXQEFC30pXuQqK9j6fSAc8ZG4mEG540idAW6QEJT4nkuPyvXjrwIDAQAB",
+  "permissions": [
+    "bookmarks",
+    "history",
+    "tabs",
+    "tabGroups",
+    "alarms",
+    "storage",
+    "unlimitedStorage",
+    "nativeMessaging"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "action": {
+    "default_title": "Bookmarker – open settings"
+  }
+}

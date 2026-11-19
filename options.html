@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Bookmarker settings</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 540px; margin: 2em auto; }
+    label { display: block; margin: 1em 0 .25em; font-weight: 600; }
+    input { padding: .3em; width: 100%; box-sizing: border-box; }
+    button { margin: 1em .5em 0 0; padding: .4em 1em; }
+    #status { margin-top: 1.5em; white-space: pre-wrap; }
+    small { color: #666; }
+  </style>
+</head>
+<body>
+  <h1>Bookmarker</h1>
+  <label for="interval">Sync interval (minutes, min 1)</label>
+  <input id="interval" type="number" min="1">
+  <label for="folder">Target folder (absolute path)</label>
+  <input id="folder" placeholder="C:\Users\you\Documents\bookmarker">
+  <small>Files written: bookmarks.json and history.json in that folder (overwritten on every sync).</small>
+  <div>
+    <button id="save">Save</button>
+    <button id="sync">Sync now</button>
+  </div>
+  <div id="status"></div>
+  <script src="options.js"></script>
+</body>
+</html>
